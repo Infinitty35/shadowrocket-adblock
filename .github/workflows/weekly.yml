@@ -1,0 +1,89 @@
+name: Weekly adlist health check
+
+on:
+  schedule:
+    # Monday 12:00 UTC = 7:00 AM CDT
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Probe upstreams, vendor HaGeZi, stamp module
+        run: |
+          set -euo pipefail
+          mkdir -p generated
+          ts="$(date -u +"%Y-%m-%d %H:%M UTC")"
+          day="$(date -u +"%Y-%m-%d")"
+
+          probe() {
+            local url="$1" label="$2"
+            local tmp code bytes
+            tmp="$(mktemp)"
+            code="$(curl -sS -L --max-time 90 -o "$tmp" -w "%{http_code}" "$url" || echo "000")"
+            bytes="$(wc -c < "$tmp" | tr -d ' ')"
+            echo "${label}|${code}|${bytes}|${tmp}|${url}"
+          }
+
+          john="$(probe "https://johnshall.github.io/Shadowrocket-ADBlock-Rules-Forever/sr_ad_only.conf" "Johnshall sr_ad_only")"
+          hage="$(probe "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.mini-onlydomains.txt" "HaGeZi pro.mini")"
+          anti="$(probe "https://anti-ad.net/surge.txt" "anti-AD surge")"
+
+          hage_tmp="$(echo "$hage" | cut -d'|' -f4)"
+          {
+            echo "# Infinitty Adblock — HaGeZi Pro Mini (DOMAIN-SET)"
+            echo "# Converted ${ts} from hagezi/dns-blocklists wildcard/pro.mini-onlydomains.txt"
+            echo "# Shadowrocket: DOMAIN-SET,https://raw.githubusercontent.com/Infinitty35/shadowrocket-adblock/main/generated/hagezi-pro-mini.txt,REJECT"
+            grep -vE '^(#|$)' "$hage_tmp" | tr -d '\r' | awk 'NF && $0 !~ / / {print tolower($0)}' | sort -u
+          } > generated/hagezi-pro-mini.txt
+
+          fail=0
+          {
+            echo "# Upstream status"
+            echo
+            echo "Last check: **${ts}**"
+            echo
+            echo "| List | HTTP | Bytes |"
+            echo "|---|---|---|"
+            for row in "$john" "$hage" "$anti"; do
+              label="$(echo "$row" | cut -d'|' -f1)"
+              code="$(echo "$row" | cut -d'|' -f2)"
+              bytes="$(echo "$row" | cut -d'|' -f3)"
+              echo "| ${label} | ${code} | ${bytes} |"
+              if [ "$code" != "200" ] || [ "$bytes" -lt 10000 ]; then
+                fail=1
+              fi
+            done
+            echo
+            echo "Vendored \`generated/hagezi-pro-mini.txt\` lines: **$(grep -cvE '^#' generated/hagezi-pro-mini.txt)**."
+            echo
+            if [ "$fail" -eq 0 ]; then
+              echo "All upstreams healthy."
+            else
+              echo "One or more upstreams failed. Shadowrocket will keep using the last good cache."
+            fi
+          } > STATUS.md
+
+          # Stamp module + conf so Shadowrocket Automatic Update sees a new file weekly
+          sed -i "s/^#!updated=.*/#!updated=${day}/" adblock.module
+          sed -i "s|^# Upstream ad lists rebuild daily.*|# Upstream ad lists rebuild daily; last repo stamp ${day}.|" adblock.conf
+
+          rm -f "$(echo "$john" | cut -d'|' -f4)" "$hage_tmp" "$(echo "$anti" | cut -d'|' -f4)"
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add STATUS.md generated/hagezi-pro-mini.txt adblock.module adblock.conf
+          if git diff --staged --quiet; then
+            echo "No change"
+          else
+            git commit -m "chore: weekly adlist refresh"
+            git push
+          fi
