@@ -18,7 +18,7 @@ https://raw.githubusercontent.com/Infinitty35/shadowrocket-adblock/main/adblock.
 3. Turn the module **on**.
 4. Home → connect → force-quit Safari / the app you care about → reopen.
 
-Leave [peacock-ads.conf](https://raw.githubusercontent.com/Infinitty35/shadowrocket-adblock/main/adblock.conf) / your existing Peacock module as-is. First-match-wins: Apple / Peacock playback / Adobe Pass are allowlisted at the top of this module.
+Leave your existing Peacock / cable-TVE config as-is. First-match-wins: Apple, Peacock playback, and Adobe Pass are allowlisted at the top of this module.
 
 ## Optional: full config
 
@@ -35,7 +35,7 @@ Config → **+** → Download from URL. Re-enable your node subscription afterwa
 1. **Settings → General → Background App Refresh** → allow Shadowrocket.
 2. Shadowrocket → **Settings → Subscribe** → enable **Update in background**.
 3. Config list → tap **ⓘ** on the active config → enable **Automatic Update**.
-4. Modules refresh when the config does. This repo’s GitHub Action runs **Monday 07:00 CDT**, probes the feeds, and stamps `#!updated=` so Shadowrocket sees a new file.
+4. Modules refresh when the config does. This repo’s GitHub Action runs **Monday 07:00 CDT**, probes the feeds, vendors HaGeZi, and stamps `#!updated=` so Shadowrocket sees a new file.
 
 The module’s remote lists:
 
