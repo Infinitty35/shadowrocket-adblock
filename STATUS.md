@@ -1,9 +1,13 @@
 # Upstream status
 
-Last check: **not yet run** (Actions will fill this every Monday 07:00 CDT, or on a manual `workflow_dispatch`).
+Last check: **2026-09-15 12:58 UTC**
 
-Manual first import does not wait on this file. Shadowrocket fetches the remote lists directly:
+| List | HTTP | Bytes |
+|---|---|---|
+| Johnshall sr_ad_only | 200 | 2236843 |
+| HaGeZi pro.mini | 200 | 989738 |
+| anti-AD surge | 200 | 3300070 |
 
-- Johnshall `sr_ad_only.conf` (RULE-SET)
-- HaGeZi `pro.mini-onlydomains.txt` (DOMAIN-SET)
-- anti-AD `surge.txt` (RULE-SET)
+Vendored `generated/hagezi-pro-mini.txt` lines: **51117**.
+
+All upstreams healthy.
