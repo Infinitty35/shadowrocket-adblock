@@ -3,7 +3,7 @@
 #!author=Infinitty35
 #!category=Advertising
 #!repo=https://github.com/Infinitty35/shadowrocket-adblock
-#!updated=2026-09-21
+#!updated=2026-09-28
 
 [Rule]
 # ========== ALLOW — first match wins. Do not let ad lists kill these. ==========
