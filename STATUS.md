@@ -1,13 +1,13 @@
 # Upstream status
 
-Last check: **2026-11-02 21:35 UTC**
+Last check: **2026-11-09 22:08 UTC**
 
 | List | HTTP | Bytes |
 |---|---|---|
-| Johnshall sr_ad_only | 200 | 2064575 |
-| HaGeZi pro.mini | 200 | 1873647 |
-| anti-AD surge | 200 | 3369720 |
+| Johnshall sr_ad_only | 200 | 2148521 |
+| HaGeZi pro.mini | 200 | 2114035 |
+| anti-AD surge | 200 | 3412275 |
 
-Vendored `generated/hagezi-pro-mini.txt` lines: **93657**.
+Vendored `generated/hagezi-pro-mini.txt` lines: **100000**.
 
 All upstreams healthy.
